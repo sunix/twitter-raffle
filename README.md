@@ -1,40 +1,47 @@
 # Paris JUG Twitter raffle website
 
-## Classic Mode
+This website is the Twitter raffle to gift our sponsor prizes.
 
-### Package
+<img src="resources/home.png" raw="true" alt="homepage">
+<img src="resources/winner.png" raw="true" alt="showing a winner">
+
+## Package
+
+The application can be packaged as a jar application, the classic mode, or as a native application, the native mode.
+
+### Classic Mode
 
 Compile project with Maven:
 
-```bash
+```shell
 mvn package
 ```
 
-### Run
+### Native Mode
 
-Run providing Twitter client credentials:
+Compile project with Maven using native profile:
 
-```bash
-java -Dtwitter4j.oauth.consumerKey=<consumerKey> -Dtwitter4j.oauth.consumerSecret=<consumerSecret> -Dtwitter4j.oauth.accessToken=<accessToken> -Dtwitter4j.oauth.accessTokenSecret=<accessTokenSecret> -jar target/twitter-raffle-1.0.0-SNAPSHOT-runner.jar
-```
-
-
-## Native Mode
-
-
-### Package
-
-```bash
+```shell
 mvn package -Pnative
 ```
 
-### Run
+## Run
 
-```bash
-export twitter4j_oauth_consumerKey=**
-export twitter4j_oauth_consumerSecret=**
-export twitter4j_oauth_accessToken=**
-export twitter4j_oauth_accessTokenSecret=**
+Run providing Twitter client credentials using CLI arguments:
 
-./target/twitter-raffle-1.0.0-SNAPSHOT-runner
+```shell
+java -Dtwitter4j.oauth.consumerKey=<consumerKey> -Dtwitter4j.oauth.consumerSecret=<consumerSecret> -Dtwitter4j.oauth.accessToken=<accessToken> -Dtwitter4j.oauth.accessTokenSecret=<accessTokenSecret> -jar target/twitter-raffle-1.0.0-SNAPSHOT-runner.jar
+```
+
+Run providing Twitter client credential using environment variables:
+
+```shell
+export twitter4j_oauth_consumerKey=<consumerKey>
+export twitter4j_oauth_consumerSecret=<consumerSecret>
+export twitter4j_oauth_accessToken=<accessToken>
+export twitter4j_oauth_accessTokenSecret=<accessTokenSecret>
+# Run classic mode
+java -jar target/twitter-raffle-1.0.0-SNAPSHOT-runner.jar
+# Run native mode
+target/twitter-raffle-1.0.0-SNAPSHOT-runner
 ```
