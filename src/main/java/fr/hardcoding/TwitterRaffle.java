@@ -1,5 +1,6 @@
 package fr.hardcoding;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -22,46 +23,41 @@ public class TwitterRaffle {
     private static final Logger LOGGER = Logger.getLogger(TwitterRaffle.class.getName());
     private static final int WINNER_COUNT = 10;
     private static final int MAX_RESULT = 100;
-    private final Twitter twitter;
-//    private static Twitter TWITTER;
 
-//    static {
-//        if (System.getenv("twitter4j_oauth_consumerKey") != null
-//                && System.getenv("twitter4j_oauth_consumerSecret") != null
-//                && System.getenv("twitter4j_oauth_accessToken") != null
-//                && System.getenv("twitter4j_oauth_accessTokenSecret") != null) {
-//
-//            ConfigurationBuilder cb = new ConfigurationBuilder();
-//            cb.setDebugEnabled(true)
-//                    .setOAuthConsumerKey(System.getenv("twitter4j_oauth_consumerKey"))
-//                    .setOAuthConsumerSecret(System.getenv("twitter4j_oauth_consumerSecret"))
-//                    .setOAuthAccessToken(System.getenv("twitter4j_oauth_accessToken"))
-//                    .setOAuthAccessTokenSecret(System.getenv("twitter4j_oauth_accessTokenSecret"));
-//            TwitterFactory tf = new TwitterFactory(cb.build());
-//
-//            TWITTER = tf.getInstance();
-//        } else {
-//            TWITTER = new TwitterFactory().getInstance();
-//        }
-//    }
+    private static Twitter twitter = null;
 
-    public TwitterRaffle() {
-        if (System.getenv("twitter4j_oauth_consumerKey") != null
-                && System.getenv("twitter4j_oauth_consumerSecret") != null
-                && System.getenv("twitter4j_oauth_accessToken") != null
-                && System.getenv("twitter4j_oauth_accessTokenSecret") != null) {
+    @ConfigProperty(name = "twitter4j.oauth.consumerKey")
+    Optional<String> consumerKey;
 
-            ConfigurationBuilder cb = new ConfigurationBuilder();
-            cb.setOAuthConsumerKey(System.getenv("twitter4j_oauth_consumerKey"))
-                    .setOAuthConsumerSecret(System.getenv("twitter4j_oauth_consumerSecret"))
-                    .setOAuthAccessToken(System.getenv("twitter4j_oauth_accessToken"))
-                    .setOAuthAccessTokenSecret(System.getenv("twitter4j_oauth_accessTokenSecret"));
-            TwitterFactory tf = new TwitterFactory(cb.build());
+    @ConfigProperty(name = "twitter4j.oauth.consumerSecret")
+    Optional<String> consumerSecret;
 
-            twitter = tf.getInstance();
-        } else {
-            twitter = new TwitterFactory().getInstance();
+    @ConfigProperty(name = "twitter4j.oauth.accessToken")
+    Optional<String> accessToken;
+
+    @ConfigProperty(name = "twitter4j.oauth.accessTokenSecret")
+    Optional<String> accessTokenSecret;
+
+    public Twitter getTwitterInstance() {
+        if (twitter == null) {
+            if (consumerKey.isPresent()
+                    && consumerSecret.isPresent()
+                    && accessToken.isPresent()
+                    && accessTokenSecret.isPresent()) {
+
+                ConfigurationBuilder cb = new ConfigurationBuilder();
+                cb.setOAuthConsumerKey(consumerKey.get())
+                        .setOAuthConsumerSecret(consumerSecret.get())
+                        .setOAuthAccessToken(accessToken.get())
+                        .setOAuthAccessTokenSecret(accessTokenSecret.get());
+                TwitterFactory tf = new TwitterFactory(cb.build());
+
+                twitter = tf.getInstance();
+            } else {
+                twitter = new TwitterFactory().getInstance();
+            }
         }
+        return twitter;
     }
 
     @Path("/raffle")
@@ -108,7 +104,7 @@ public class TwitterRaffle {
     }
 
     private Predicate<Status> getTweetFilter(String speaker) {
-        // Remove parisjug, given speaker, white spaces, twitter URL and check if remains few text
+        // Remove parisjug, given speaker, white spaces, twitter URL and check if remains few text
         return status -> {
             String text = status.getText();
             String originalText = text;
@@ -131,7 +127,7 @@ public class TwitterRaffle {
         Map<String, List<Status>> userTweets = new HashMap<>();
         QueryResult result;
         do {
-            result = twitter.search(query);
+            result = getTwitterInstance().search(query);
             RateLimitStatus limit = result.getRateLimitStatus();
             LOGGER.info(String.format(
                     "Rate Limit for Query: %s/%s. Reset in %s seconds",
