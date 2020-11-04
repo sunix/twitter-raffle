@@ -1,9 +1,12 @@
 package fr.hardcoding;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -58,6 +61,17 @@ public class TwitterRaffle {
             }
         }
         return twitter;
+    }
+
+    @Inject
+    @RestClient
+    PublishTwitterService twitterService;
+
+    @Path("/publish.twitter.com")
+    @GET
+    @Produces(APPLICATION_JSON)
+    public Tweet twitter(@QueryParam("url") String url) {
+        return twitterService.getTwitterPost(url, "true");
     }
 
     @Path("/raffle")

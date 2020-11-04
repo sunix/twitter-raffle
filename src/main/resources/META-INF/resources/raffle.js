@@ -24,7 +24,7 @@ function showNextWinner() {
     const winner = globalWinners[globalCurrentWinner];
     const tweetUrl = winner.tweetUrl;
     // Request embedded tweet HTML code
-    const url = "https://cors-anywhere.herokuapp.com/publish.twitter.com/oembed?url=" + encodeURI(tweetUrl) + "&omit_script=true";
+    const url = "/publish.twitter.com?url=" + encodeURI(tweetUrl);
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.responseType = 'json';
