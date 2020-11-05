@@ -1,13 +1,13 @@
 FROM quay.io/quarkus/centos-quarkus-maven:20.0.0-java8 as quarkus-dev
-COPY --chown=1001:1001 . /twitter-raffle
+COPY --chown=1001:1001 src pom.xml resources /twitter-raffle
 WORKDIR /twitter-raffle
 RUN pwd && ls && env && \
     mvn package -Dnative
+COPY target/*-runner application
 
 FROM registry.access.redhat.com/ubi8/ubi
-COPY --from=quarkus-dev /twitter-raffle/target /work/target
+COPY --from=quarkus-dev /twitter-raffle/application /work/application
 WORKDIR /work/
-COPY target/*-runner /work/application
 RUN chmod 775 /work
 EXPOSE 8080
 CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
