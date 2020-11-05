@@ -1,4 +1,4 @@
-FROM quay.io/quarkus/centos-quarkus-maven:20.0.0-java8 as quarkus-dev
+FROM quay.io/eclipse/che-quarkus:nightly as quarkus-dev
 COPY --chown=1001:1001 . /twitter-raffle
 WORKDIR /twitter-raffle
 RUN pwd && ls && env && \
