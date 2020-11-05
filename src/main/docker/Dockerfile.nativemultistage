@@ -1,7 +1,7 @@
 FROM quay.io/quarkus/centos-quarkus-maven:20.0.0-java8 as quarkus-dev
-COPY --chown=1001:1001 src pom.xml resources /twitter-raffle
+COPY --chown=1001:1001 src /twitter-raffle
 WORKDIR /twitter-raffle
-RUN pwd && ls && env && \
+RUN pwd && ls src && env && \
     mvn package -Dnative
 COPY target/*-runner application
 
